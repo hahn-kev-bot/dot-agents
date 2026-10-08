@@ -1,0 +1,17 @@
+# Private planning notes (issue tracker, ADRs) for specific repos.
+agent-issues/
+
+# Claude desktop's synced skills land here when ~/.claude/skills points at this folder.
+skills/synced/
+
+*.zip
+
+# Upstream has no license (cursor/plugins), so these stay local-only.
+skills/arena/
+skills/deslop/
+skills/unslop/
+skills/poteto-mode/
+
+# License or provenance not confirmed yet; local-only until it is.
+skills/android-cli/
+skills/devin-review/
