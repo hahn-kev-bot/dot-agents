@@ -11,4 +11,4 @@ read [Web Guidance](./guidance/WEB.md)
 When the shell is Git Bash or PowerShell on Windows, read [Windows Guidance](./guidance/WINDOWS.md)
 
 ## Subagents
-When writing a subagent definition or a subagent prompt, read the [writing-for-agents skill](./skills/writing-for-agents/SKILL.md). A subagent starts cold, so its prompt also states the goal, what's already known, the scope, and what to return.
+When writing a subagent definition or a subagent prompt, read [Subagent Guidance](./guidance/SUBAGENTS.md)
