@@ -17,7 +17,9 @@ Kevin's agent setup in one repo: global agent guidance (`AGENTS.md` + `guidance/
 ├── skills/              # one folder per skill (SKILL.md + resources)
 ├── agents/              # Claude Code subagents (<name>.md)
 ├── .skill-lock.json     # where each upstream skill came from (managed by the `skills` CLI)
-├── cloud/setup.sh       # cloud environment setup script
+├── settings/            # skill-overrides.json, merged into ~/.claude/settings.json by the setup scripts
+├── cloud/setup.sh       # cloud (and macOS/Linux) setup script
+├── setup.ps1            # Windows setup script
 └── licenses/            # upstream licenses for the skills copied in here
 ```
 
@@ -27,16 +29,15 @@ Claude Code cloud sessions don't load anything from your machine's `~/.claude`, 
 
 ## Local setup (Windows)
 
-On a fresh machine, clone into `~/.agents`, then point Claude Code at it. Run in `cmd` or PowerShell:
+Run in PowerShell (Windows PowerShell 5.1 or PowerShell 7):
 
 ```powershell
-git clone https://github.com/hahn-kev-bot/dot-agents.git $HOME\.agents
-cmd /c mklink /J "$HOME\.claude\skills" "$HOME\.agents\skills"
-cmd /c mklink /J "$HOME\.claude\agents" "$HOME\.agents\agents"
-Add-Content "$HOME\.claude\CLAUDE.md" '@~/.agents/AGENTS.md'
+irm https://raw.githubusercontent.com/hahn-kev-bot/dot-agents/main/setup.ps1 | iex
 ```
 
-If `~/.claude/skills` already exists, move it aside first. The `skills` CLI can also manage per-skill links instead of one junction; that is how the original machine is set up (`npx skills add ... -g -a claude-code codex` puts the skill here and links it into `~/.claude/skills`).
+Or, from an existing clone, `~\.agents\setup.ps1`. It does the same as the cloud script: clones or pulls `~/.agents`, junctions `~/.claude/skills` and `~/.claude/agents` to it, imports `AGENTS.md`, and merges the [skill overrides](#skill-overrides). Re-run it to update.
+
+If `~/.claude/skills` is a real folder, the script moves it to `skills.pre-dot-agents`, unless it holds links into `~/.agents`. That means the `skills` CLI manages per-skill links there (`npx skills add ... -g -a claude-code codex` puts the skill here and links it into `~/.claude/skills`), which is how the original machine is set up, so the script leaves it alone.
 
 On macOS or Linux, run `cloud/setup.sh` with `DOT_AGENTS_REPO` unset; it does the same thing.
 
@@ -53,10 +54,19 @@ The setup script belongs to the environment, not to a repository, so every repo 
 1. Clones this repo to `~/.agents` (or pulls if it is already there).
 2. Links `~/.claude/skills` and `~/.claude/agents` to it, moving any existing folder to `*.pre-dot-agents`.
 3. Adds `@~/.agents/AGENTS.md` to `~/.claude/CLAUDE.md`.
+4. Merges the [skill overrides](#skill-overrides) into `~/.claude/settings.json` (needs `jq` or `python3`).
 
 The environment's network access must allow GitHub (the default "Trusted" level does). To check it worked, start a session and run `/skills` or ask which skills are available.
 
 Set `DOT_AGENTS_REPO` to use a fork.
+
+## Skill overrides
+
+Claude Code gives the list of skill descriptions about 1% of the context window. With this many skills the descriptions don't all fit, and the ones past the cutoff are listed by name only, wherever they fall alphabetically. `settings/skill-overrides.json` sets skills to `name-only` (listed without a description) when their name says when to use them, so the rest keep their descriptions. Skills whose siblings overlap, such as the test-quality and build-performance families, keep their descriptions so Claude can pick the right one.
+
+The setup scripts merge the file into `~/.claude/settings.json`, but **an override the machine already has always wins**. A machine can hide skills that can't run there with `"user-invocable-only"` (still available as `/name`), without changing this repo. For example, a Linux box can hide the MAUI and crash-symbolication skills. Because a machine's existing entry wins, a later change to a skill already in its settings doesn't reach it; edit that machine's settings by hand.
+
+Overrides live in settings, not in SKILL.md frontmatter, so `npx skills update` doesn't undo them.
 
 ## Updating
 

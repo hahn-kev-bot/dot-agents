@@ -1,5 +1,6 @@
 #!/bin/bash
-# Claude Code cloud environment setup: installs this repo's skills, agents and global AGENTS.md.
+# Claude Code cloud environment setup: installs this repo's skills, agents, global AGENTS.md
+# and shared skill overrides. Also the macOS/Linux setup; Windows uses setup.ps1.
 #
 # Paste this one line into the environment's setup script (claude.ai/code > environment settings):
 #   curl -fsSL https://raw.githubusercontent.com/hahn-kev-bot/dot-agents/main/cloud/setup.sh | bash
@@ -30,5 +31,30 @@ done
 
 import_line='@~/.agents/AGENTS.md'
 grep -qxF "$import_line" "$HOME/.claude/CLAUDE.md" 2>/dev/null || echo "$import_line" >> "$HOME/.claude/CLAUDE.md"
+
+# Shared skill overrides (settings/skill-overrides.json) go into ~/.claude/settings.json.
+# Overrides the machine already has win, so each machine can hide or change skills
+# for itself. Settings, unlike SKILL.md frontmatter, survive `npx skills update`.
+overrides="$dest/settings/skill-overrides.json"
+settings="$HOME/.claude/settings.json"
+if [ -f "$overrides" ]; then
+  [ -s "$settings" ] || echo '{}' > "$settings"
+  tmp="$(mktemp)"
+  if command -v jq >/dev/null; then
+    jq --slurpfile shared "$overrides" \
+      '.skillOverrides = ($shared[0].skillOverrides + (.skillOverrides // {}))' "$settings" > "$tmp"
+  elif command -v python3 >/dev/null; then
+    python3 - "$settings" "$overrides" > "$tmp" <<'PY'
+import json, sys
+settings, shared = (json.load(open(p)) for p in sys.argv[1:])
+settings["skillOverrides"] = {**shared["skillOverrides"], **settings.get("skillOverrides", {})}
+print(json.dumps(settings, indent=2))
+PY
+  else
+    echo "dot-agents: neither jq nor python3 found, skipped merging skill overrides" >&2
+  fi
+  if [ -s "$tmp" ] && ! cmp -s "$tmp" "$settings"; then cat "$tmp" > "$settings"; fi
+  rm -f "$tmp"
+fi
 
 echo "dot-agents: $(ls "$dest/skills" | wc -l) skills, $(ls "$dest/agents" | wc -l) agents linked into $HOME/.claude"
