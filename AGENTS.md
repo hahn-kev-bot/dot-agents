@@ -15,3 +15,6 @@ When the shell is Git Bash or PowerShell on Windows, read [Windows Guidance](./g
 
 ## Subagents
 When writing a subagent definition or a subagent prompt, read [Subagent Guidance](./guidance/SUBAGENTS.md)
+
+## GitHub writes
+Before any `gh` write beyond push, PR create or comment (edit, close, label, merge, auto-merge, rerun), read [GitHub Guidance](./guidance/GITHUB.md): `gh` runs as a bot that lacks those permissions.

@@ -8,7 +8,7 @@ Implement the work described by the user in the spec or tickets.
 
 Call the Skill tool with "tdd" where possible, at pre-agreed seams.
 
-Run typechecking regularly, single test files regularly, and the full test suite once at the end.
+Run typechecking regularly and single test files regularly. At the end, run the repo's own verify command (its AGENTS.md names it; follow its rules on which suites to run locally). Run the full suite only where the repo says nothing.
 
 Once done, call the Skill tool with "code-review" to review the work.
 
