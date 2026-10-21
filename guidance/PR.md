@@ -1,1 +1,0 @@
-When creating a PR I want a section left blank at the top for me to write about the PR first. Then put an AI summary below that with a divider, and put the summary in a collapsable section. If there's a test plan put that below the summary outside of that section.

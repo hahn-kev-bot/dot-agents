@@ -13,7 +13,7 @@ Kevin's agent setup in one repo: global agent guidance (`AGENTS.md` + `guidance/
 ```text
 ~/.agents/
 ├── AGENTS.md            # global guidance, pointers only
-├── guidance/            # PR, CI, web and Windows-shell rules AGENTS.md points at
+├── guidance/            # CI, web, Windows-shell and subagent rules AGENTS.md points at
 ├── skills/              # one folder per skill (SKILL.md + resources)
 ├── agents/              # Claude Code subagents (<name>.md)
 ├── .skill-lock.json     # where each upstream skill came from (managed by the `skills` CLI)
